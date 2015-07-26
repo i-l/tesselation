@@ -46,11 +46,11 @@
 				return points;
 			}
 			
-			var addPoints = function(points, refPoint, refAngle, angles, distances, reversed) {
+			var addPoints = function(points, refPoint, refAngle, angles, distances, r, reversed) {
 				for (var i = 0; i < angles.length; i++) {
 					var num = reversed ? angles.length - 1 - i : i;
 					var angle = (refAngle + angles[num]) * Math.PI / 180;
-					points.push(getNextPoint(refPoint, angle, distances[num]));
+					points.push(getNextPoint(refPoint, angle, distances[num] * r));
 				}
 			}			
 			
@@ -60,18 +60,18 @@
 				var refAngle = -90 + startAngle;
 				
 				var angles = [[0, 50, 28, 32, 60, 68, 120, 154, 150, 120],[0, 24, 51, 60, 114, 96, 78, 60],[0, -58, -41, -32, 12.5,  23, 19, 24, 18, 0]];				
-				var distances = [[0, 0.24*r, 0.28*r, 0.43*r, 0.52*r, 0.514*r, 0.25*r, 0.625*r, 0.764*r, r],
-								[0, 0.35*r, 0.47*r, 0.7*r, 0.77*r, 1.09*r, 0.93* r,r],
-								[0, 0.52*r, 0.82*r, 0.45*r, 0.36*r, 0.47*r, 0.875*r, 0.99 *r, 1.17*r, r]];
+				var distances = [[0, 0.24, 0.28, 0.43, 0.52, 0.514, 0.25, 0.625, 0.764, 1],
+								[0, 0.35, 0.47, 0.7, 0.77, 1.09, 0.93, 1],
+								[0, 0.52, 0.82, 0.45, 0.36, 0.47, 0.875, 0.99, 1.17, 1]];
 				
 				var reference = getPointByAngle(r, x, y, angle);			
 				
 				for (var i = 0; i < 3; i++) {
 					angle += 120;
 					refAngle -= 180;
-					addPoints(points, reference, refAngle, angles[i], distances[i], false);
+					addPoints(points, reference, refAngle, angles[i], distances[i], r, false);
 					reference = getPointByAngle(r, x, y, angle);
-					addPoints(points, reference, refAngle - 120, angles[i], distances[i], true);
+					addPoints(points, reference, refAngle - 120, angles[i], distances[i], r, true);
 				}
 				
 				return points;

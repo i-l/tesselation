@@ -20,10 +20,10 @@
     		<script type="text/javascript">
 
 			//Width and height
-			var w = 1000;
-			var h = 900;
+			var w = 840;
+			var h = 760;
 			  
-			var svg2 = d3.select("body")
+			var svg = d3.select("body")
 						.append("svg")
 						.attr("width", w)
 						.attr("height", h);
@@ -128,7 +128,7 @@
 				}
 			}
 			
-			svg2.selectAll("path")
+			svg.selectAll("path")
 			   .data(dataset)
 			   .enter()
 			   .append("path")
@@ -148,19 +148,16 @@
 			var counter = 0;
 			d3.select("svg")
 				.on("click", function() {
-					svg2.selectAll("path")
+					svg.selectAll("path")
 						.transition()
 						.duration(2000)
 						.ease("linear")
 						.attr("d", function(d) {
 							return lineFunction(lizard ? getLizardPoints(d.r, d.x, d.y, d.angle  + counter * 120) : getGenericPoints(d.r, d.x, d.y, d.angle + counter * 120));
 						});					;
-					lizard = !lizard;
-					if (lizard) {
-						counter++;
-						console.log(counter);
-						
-						svg2.selectAll("path")
+					if (!lizard) {
+						counter++;			
+						svg.selectAll("path")
 						.transition()
 						.delay(2000)
 						.duration(0)
@@ -168,6 +165,7 @@
 							return lineFunction(getGenericPoints(d.r, d.x, d.y, d.angle + counter * 120));
 						});					;
 					}
+					lizard = !lizard;
 			});
 		</script>
  	  </section>

@@ -7,14 +7,13 @@
 
 	<script type="text/javascript" src="./d3/d3.js"></script>
     <link rel="stylesheet" href="stylesheets/styles.css">
-    <link rel="stylesheet" href="stylesheets/github-light.css">
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
   
   </head>
   <body>
     <div class="wrapper">
       <header>
-        <h1>Tesselation</h1>
+        <h2>Tesselation</h2>
         <p>M. C. Escher&#39;s reptile tesselations and d3</p>
       </header>
       <section>
@@ -104,13 +103,12 @@
 				return points;
 			}
 			
-			//This is the accessor function we talked about above
 			var lineFunction = d3.svg.line()
                           .x(function(d) { return d.x; })
                           .y(function(d) { return d.y; })
                           .interpolate("linear");
             
-			var r = 50;
+			var r = 45;
 			var x = 500;
 			var y = 0;
 			
@@ -124,10 +122,9 @@
 				x -= 2 * r * Math.cos( Math.PI / 6) * Math.cos(Math.PI / 6);
 				num++;
 				for (var j = 0; j < num; j++) {
-					dataset.push({"r" : r, "x": x + j * r * 3, "y": y, "angle": angles[0], "fill": colors[0]});
-					dataset.push({"r" : r, "x": x + j * r * 3, "y": y + 2 * r * Math.cos( Math.PI / 6), "angle": angles[1], "fill": colors[1]});
-					dataset.push({"r" : r, "x": x + j * r * 3 + 2 * r * Math.cos( Math.PI / 6) * Math.cos(Math.PI / 6), 
-					"y": y + 2 * r * Math.sin( Math.PI / 6)* Math.cos(Math.PI / 6), "angle": angles[2], "fill": colors[2]});
+					dataset.push({"r" : r, "x": x + j * r * 3, "y": y, "angle": angles[0], "color": colors[0]});
+					dataset.push({"r" : r, "x": x + j * r * 3, "y": y + 2 * r * Math.cos( Math.PI / 6), "angle": angles[1], "color": colors[1]});
+					dataset.push({"r" : r, "x": x + j * r * 3 + 2 * r * Math.cos( Math.PI / 6) * Math.cos(Math.PI / 6), "y": y + r * Math.cos(Math.PI / 6), "angle": angles[2], "color": colors[2]});
 				}
 			}
 			
@@ -139,11 +136,11 @@
 			  		return lineFunction(getLizardPoints(d.r, d.x, d.y, d.angle));
 			   })
 			   .attr("stroke", function(d) {
-					return d.fill;
+					return d.color;
 			   })
                .attr("stroke-width", 1)
                .attr("fill", function(d) {
-					return d.fill;
+					return d.color;
 			   });
 			
 			//On click, update with new data			

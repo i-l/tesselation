@@ -38,32 +38,21 @@
 				return { "x": point.x + dist * (Math.sin(angle)), "y": (point.y + dist * Math.cos(angle)) };
 			}
 			
-			var addGenericPoints = function(points, refPoint, angle, numPoints, r, reversed) {
+			var addLinePoints = function(points, refPoint, angle, numPoints, r) {
 				for (var i = 0; i < numPoints; i++) {
-					var num = reversed ? numPoints - i - 1 : i;					
-					points.push(getNextPoint(refPoint, angle * Math.PI / 180, num * r / (numPoints - 1)));
+					points.push(getNextPoint(refPoint, angle * Math.PI / 180, i * r / (numPoints - 1)));
 				}	
 			}
 			
 			var getGenericPoints = function(r, x, y, angle) {
 				var points = [];
-				var distances = [0, 0.1 * r, 0.2 * r, 0.31 * r, 0.42 * r, 0.53 * r, 0.64 * r, 0.75 * r, 0.87 * r, r];
-				
-				var reference = getPointByAngle(r, x, y, angle + 90);
-				addGenericPoints(points, reference, angle + 210, 10, r, false);
-				reference = getPointByAngle(r, x, y, angle + 210);
-				addGenericPoints(points, reference, angle + 90, 10, r, true);
-				
-				addGenericPoints(points, reference, angle -30, 8, r, false);
-				reference = getPointByAngle(r, x, y, angle -30);
-				addGenericPoints(points, reference, angle + 210, 8, r, true);
-								
-				addGenericPoints(points, reference, angle + 90, 10, r, false);
-				reference = getPointByAngle(r, x, y, angle + 90);
-				addGenericPoints(points, reference, angle -30, 10, r, true);
-				
+				for (var i = 0; i < 6; i++) {
+					var reference = getPointByAngle(r, x, y, angle + 90 + i * 60);
+					addLinePoints(points, reference, angle - 150 + i * 60, (i == 2 || i == 3) ? 8 : 10, r);
+				}	
 				return points;
 			}
+			
 			var addPoints = function(points, refPoint, refAngle, angles, distances, reversed) {
 				for (var i = 0; i < angles.length; i++) {
 					var num = reversed ? angles.length - 1 - i : i;
@@ -71,35 +60,27 @@
 					points.push(getNextPoint(refPoint, angle, distances[num]));
 				}
 			}			
-				
+			
 			var getLizardPoints = function(r, x, y, startAngle) {
 				var points = [];
-				var angles = [0, 50, 28, 32, 60, 68, 120, 154, 150, 120]				
-				var distances = [0, 0.24 * r, 0.28 * r, 0.43 * r, 0.52 * r, 0.514 * r, 0.25 * r, 0.625 * r, 0.764 * r, r];
 				var angle = 90 + startAngle;
-				var refAngle = 90 + startAngle;
-				var reference = getPointByAngle(r, x, y, angle);
+				var refAngle = -90 + startAngle;
 				
-				addPoints(points, reference, refAngle, angles, distances, false);
-				reference = getPointByAngle(r, x, y, angle + 120);
-				addPoints(points, reference, refAngle - 120, angles, distances, true);
+				var angles = [[0, 50, 28, 32, 60, 68, 120, 154, 150, 120],[0, 24, 51, 60, 114, 96, 78, 60],[0, -58, -41, -32, 12.5,  23, 19, 24, 18, 0]];				
+				var distances = [[0, 0.24*r, 0.28*r, 0.43*r, 0.52*r, 0.514*r, 0.25*r, 0.625*r, 0.764*r, r],
+								[0, 0.35*r, 0.47*r, 0.7*r, 0.77*r, 1.09*r, 0.93* r,r],
+								[0, 0.52*r, 0.82*r, 0.45*r, 0.36*r, 0.47*r, 0.875*r, 0.99 *r, 1.17*r, r]];
 				
-				angles = [0, 24, 51, 60, 114, 96, 78, 60];
-				distances = [0, 0.35*r, 0.47*r, 0.7*r, 0.77*r, 1.09*r, 0.93* r,r]
+				var reference = getPointByAngle(r, x, y, angle);			
 				
-				refAngle -= 180;
-				addPoints(points, reference, refAngle, angles, distances, false);
-				reference = getPointByAngle(r, x, y, angle + 240);
-				addPoints(points, reference, refAngle - 120, angles, distances, true);
-							
-				angles = [0, -58, -41, -32, 12.5,  23, 19, 24, 18, 0];
-				distances = [0, 0.52*r, 0.82*r, 0.45*r, 0.36*r, 0.47*r, 0.875*r, 0.99 *r, 1.17*r, r]
+				for (var i = 0; i < 3; i++) {
+					angle += 120;
+					refAngle -= 180;
+					addPoints(points, reference, refAngle, angles[i], distances[i], false);
+					reference = getPointByAngle(r, x, y, angle);
+					addPoints(points, reference, refAngle - 120, angles[i], distances[i], true);
+				}
 				
-				refAngle -= 180;
-				addPoints(points, reference, refAngle, angles, distances, false);
-				reference = getPointByAngle(r, x, y, angle);
-				addPoints(points, reference, refAngle - 120, angles, distances, true);
-
 				return points;
 			}
 			
@@ -142,12 +123,10 @@
                .attr("fill", function(d) {
 					return d.color;
 			   });
-			
-			//On click, update with new data			
-			
+		
 			var counter = 0;
 			d3.select("svg")
-				.on("click", function() {
+				.on("click", function(e) {
 					svg.selectAll("path")
 						.transition()
 						.duration(2000)

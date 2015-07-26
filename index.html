@@ -18,17 +18,10 @@
       </header>
       <section>
     		<script type="text/javascript">
-
-			//Width and height
 			var w = 840;
 			var h = 760;
-			  
-			var svg = d3.select("body")
-						.append("svg")
-						.attr("width", w)
-						.attr("height", h);
-			
-			var lizard = false;
+			var svg = d3.select("body").append("svg").attr("width", w).attr("height", h);
+			var reptiles = true;
 		
 			var getPointByAngle = function(r, x, y, angle) {
 				return { "x": (x + r * Math.sin(Math.PI * angle / 180)),  "y": (y + r * Math.cos(Math.PI * angle / 180))}; 
@@ -90,22 +83,20 @@
                           .interpolate("linear");
             
 			var r = 45;
-			var x = 500;
-			var y = 0;
+			var x = 400;
+			var y = 100;
 			
-			var colors = ["#181C7F", "#7D82FF", "#3138FF", "#9467bd"];
+			var colors = ["#181C7F", "#7D82FF", "#3138FF" ];
 			var angles = [0, 120, 240];
+			var xShift = [0, 0, 2 * Math.cos( Math.PI / 6) * Math.cos(Math.PI / 6)];
+			var yShift = [0, 2 * Math.cos( Math.PI / 6), Math.cos(Math.PI / 6)];
 			var dataset = [];
-			var num = 0;
 			
 			for (var i = 0; i < 5; i++) {
-				y += 3 * r * Math.cos( Math.PI / 6);
-				x -= 2 * r * Math.cos( Math.PI / 6) * Math.cos(Math.PI / 6);
-				num++;
-				for (var j = 0; j < num; j++) {
-					dataset.push({"r" : r, "x": x + j * r * 3, "y": y, "angle": angles[0], "color": colors[0]});
-					dataset.push({"r" : r, "x": x + j * r * 3, "y": y + 2 * r * Math.cos( Math.PI / 6), "angle": angles[1], "color": colors[1]});
-					dataset.push({"r" : r, "x": x + j * r * 3 + 2 * r * Math.cos( Math.PI / 6) * Math.cos(Math.PI / 6), "y": y + r * Math.cos(Math.PI / 6), "angle": angles[2], "color": colors[2]});
+				for (var j = 0; j < i + 1; j++) {
+					for (var k = 0; k < 3; k++) {
+						dataset.push({"r" : r, "x": x + r*(3 * j + xShift[k] - i * xShift[2]), "y": y + (yShift[k] + 3 * i * yShift[2]) * r, "angle": angles[k], "color": colors[k]});			
+					}
 				}
 			}
 			
@@ -125,16 +116,17 @@
 			   });
 		
 			var counter = 0;
-			d3.select("svg")
-				.on("click", function(e) {
+			svg.on("click", function(e) {
+					reptiles = !reptiles;
 					svg.selectAll("path")
 						.transition()
 						.duration(2000)
 						.ease("linear")
 						.attr("d", function(d) {
-							return lineFunction(lizard ? getLizardPoints(d.r, d.x, d.y, d.angle  + counter * 120) : getGenericPoints(d.r, d.x, d.y, d.angle + counter * 120));
-						});					;
-					if (!lizard) {
+							return lineFunction(reptiles ? getLizardPoints(d.r, d.x, d.y, d.angle  + counter * 120) : getGenericPoints(d.r, d.x, d.y, d.angle + counter * 120));
+						});		
+					// additional 120 degree turn
+					if (!reptiles) {
 						counter++;			
 						svg.selectAll("path")
 						.transition()
@@ -144,11 +136,9 @@
 							return lineFunction(getGenericPoints(d.r, d.x, d.y, d.angle + counter * 120));
 						});					;
 					}
-					lizard = !lizard;
 			});
 		</script>
  	  </section>
     </div>
-    <script src="javascripts/scale.fix.js"></script>
   </body>
 </html>

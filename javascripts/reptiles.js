@@ -15,3 +15,33 @@ function getHexagonPoints(r, x, y, angle) {
 	}	
 	return points;
 }
+
+function addReptilePoints(points, refPoint, refAngle, angles, distances, r, reversed) {
+	for (var i = 0; i < angles.length; i++) {
+		var num = reversed ? angles.length - 1 - i : i;
+		var angle = (refAngle + angles[num]) * Math.PI / 180;
+		points.push(getNextPoint(refPoint, angle, distances[num] * r));
+	}
+}			
+			
+function getReptilePoints(r, x, y, startAngle) {
+	var points = [];
+	var angle = 90 + startAngle;
+	var refAngle = -90 + startAngle;
+	var angles = [[0, 50, 28, 32, 60, 68, 120, 154, 150, 120],[0, 24, 51, 60, 114, 96, 78, 60],[0, -58, -41, -32, 12.5,  23, 19, 24, 18, 0]];				
+	var distances = [[0, 0.24, 0.28, 0.43, 0.52, 0.514, 0.25, 0.625, 0.764, 1],
+					[0, 0.35, 0.47, 0.7, 0.77, 1.09, 0.93, 1],
+					[0, 0.52, 0.82, 0.45, 0.36, 0.47, 0.875, 0.99, 1.17, 1]];
+	var reference = getPointByAngle(r, x, y, angle);			
+		
+	for (var i = 0; i < 3; i++) {
+		angle += 120;
+		refAngle -= 180;
+		addReptilePoints(points, reference, refAngle, angles[i], distances[i], r, false);
+		reference = getPointByAngle(r, x, y, angle);
+		addReptilePoints(points, reference, refAngle - 120, angles[i], distances[i], r, true);
+	}
+		
+	return points;
+}
+	

@@ -1,0 +1,142 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Reptiles Tesselation</title>
+
+	<script type="text/javascript" src="./d3/d3.js"></script>
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+  
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h2>Tesselation</h2>
+        <p>M. C. Escher&#39;s reptile tesselations and d3.js</p>
+      </header>
+      <section>
+    		<script type="text/javascript">
+			var w = 840;
+			var h = 680;
+			var svg = d3.select("body").append("svg").attr("width", w).attr("height", h);
+			var reptiles = true;
+		
+			var getPointByAngle = function(r, x, y, angle) {
+				return { "x": (x + r * Math.sin(Math.PI * angle / 180)),  "y": (y + r * Math.cos(Math.PI * angle / 180))}; 
+			}
+			
+			var getNextPoint = function(point, angle, dist) {
+				return { "x": point.x + dist * (Math.sin(angle)), "y": (point.y + dist * Math.cos(angle)) };
+			}
+			
+			var addLinePoints = function(points, refPoint, angle, numPoints, r) {
+				for (var i = 0; i < numPoints; i++) {
+					points.push(getNextPoint(refPoint, angle * Math.PI / 180, i * r / (numPoints - 1)));
+				}	
+			}
+			
+			var getGenericPoints = function(r, x, y, angle) {
+				var points = [];
+				for (var i = 0; i < 6; i++) {
+					var reference = getPointByAngle(r, x, y, angle + 90 + i * 60);
+					addLinePoints(points, reference, angle - 150 + i * 60, (i == 2 || i == 3) ? 8 : 10, r);
+				}	
+				return points;
+			}
+			
+			var addPoints = function(points, refPoint, refAngle, angles, distances, r, reversed) {
+				for (var i = 0; i < angles.length; i++) {
+					var num = reversed ? angles.length - 1 - i : i;
+					var angle = (refAngle + angles[num]) * Math.PI / 180;
+					points.push(getNextPoint(refPoint, angle, distances[num] * r));
+				}
+			}			
+			
+			var getLizardPoints = function(r, x, y, startAngle) {
+				var points = [];
+				var angle = 90 + startAngle;
+				var refAngle = -90 + startAngle;
+				var angles = [[0, 50, 28, 32, 60, 68, 120, 154, 150, 120],[0, 24, 51, 60, 114, 96, 78, 60],[0, -58, -41, -32, 12.5,  23, 19, 24, 18, 0]];				
+				var distances = [[0, 0.24, 0.28, 0.43, 0.52, 0.514, 0.25, 0.625, 0.764, 1],
+								[0, 0.35, 0.47, 0.7, 0.77, 1.09, 0.93, 1],
+								[0, 0.52, 0.82, 0.45, 0.36, 0.47, 0.875, 0.99, 1.17, 1]];
+				var reference = getPointByAngle(r, x, y, angle);			
+				
+				for (var i = 0; i < 3; i++) {
+					angle += 120;
+					refAngle -= 180;
+					addPoints(points, reference, refAngle, angles[i], distances[i], r, false);
+					reference = getPointByAngle(r, x, y, angle);
+					addPoints(points, reference, refAngle - 120, angles[i], distances[i], r, true);
+				}
+				
+				return points;
+			}
+			
+			var lineFunction = d3.svg.line()
+                          .x(function(d) { return d.x; })
+                          .y(function(d) { return d.y; })
+                          .interpolate("linear");
+            
+			var r = 45;
+			var x = 250;
+			var y = 70;
+			
+			var colors = ["#181C7F", "#7D82FF", "#3138FF" ];
+			var angles = [0, 120, 240];
+			var xShift = [0, 0, 2 * Math.cos( Math.PI / 6) * Math.cos(Math.PI / 6)];
+			var yShift = [0, 2 * Math.cos( Math.PI / 6), Math.cos(Math.PI / 6)];
+			var dataset = [];
+			
+			for (var i = 0; i < 5; i++) {
+				for (var j = Math.max(0, i - 2); j < Math.min(i + 3, 5); j++) {
+					for (var k = 0; k < 3; k++) {
+						dataset.push({"r" : r, "x": x + r*(3 * j + xShift[k] - i * xShift[2]), "y": y + (yShift[k] + 3 * i * yShift[2]) * r, "angle": angles[k], "color": colors[k]});			
+					}
+				}
+			}
+			
+			svg.selectAll("path")
+			   .data(dataset)
+			   .enter()
+			   .append("path")
+			   .attr("d", function(d) {
+			  		return lineFunction(getLizardPoints(d.r, d.x, d.y, d.angle));
+			   })
+			   .attr("stroke", function(d) {
+					return d.color;
+			   })
+               .attr("stroke-width", 1)
+               .attr("fill", function(d) {
+					return d.color;
+			   });
+		
+			var counter = 0;
+			svg.on("click", function(e) {
+					reptiles = !reptiles;
+					svg.selectAll("path")
+						.transition()
+						.duration(2000)
+						.ease("linear")
+						.attr("d", function(d) {
+							return lineFunction(reptiles ? getLizardPoints(d.r, d.x, d.y, d.angle  + counter * 120) : getGenericPoints(d.r, d.x, d.y, d.angle + counter * 120));
+						});		
+					// additional 120 degree turn
+					if (!reptiles) {
+						counter++;			
+						svg.selectAll("path")
+						.transition()
+						.delay(2000)
+						.duration(0)
+						.attr("d", function(d) {
+							return lineFunction(getGenericPoints(d.r, d.x, d.y, d.angle + counter * 120));
+						});					;
+					}
+			});
+		</script>
+ 	  </section>
+    </div>
+  </body>
+</html>

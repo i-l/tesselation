@@ -17,7 +17,8 @@
         <p>M. C. Escher&#39;s reptile tesselations and d3.js</p>
       </header>
       <section>
-    		<script type="text/javascript">
+		<script src="javascripts/reptiles.js"></script>
+    	<script type="text/javascript">
 			var w = 840;
 			var h = 680;
 			var svg = d3.select("body").append("svg").attr("width", w).attr("height", h);
@@ -30,22 +31,7 @@
 			var getNextPoint = function(point, angle, dist) {
 				return { "x": point.x + dist * (Math.sin(angle)), "y": (point.y + dist * Math.cos(angle)) };
 			}
-			
-			var addLinePoints = function(points, refPoint, angle, numPoints, r) {
-				for (var i = 0; i < numPoints; i++) {
-					points.push(getNextPoint(refPoint, angle * Math.PI / 180, i * r / (numPoints - 1)));
-				}	
-			}
-			
-			var getGenericPoints = function(r, x, y, angle) {
-				var points = [];
-				for (var i = 0; i < 6; i++) {
-					var reference = getPointByAngle(r, x, y, angle + 90 + i * 60);
-					addLinePoints(points, reference, angle - 150 + i * 60, (i == 2 || i == 3) ? 8 : 10, r);
-				}	
-				return points;
-			}
-			
+						
 			var addPoints = function(points, refPoint, refAngle, angles, distances, r, reversed) {
 				for (var i = 0; i < angles.length; i++) {
 					var num = reversed ? angles.length - 1 - i : i;
@@ -121,7 +107,7 @@
 						.duration(2000)
 						.ease("linear")
 						.attr("d", function(d) {
-							return lineFunction(reptiles ? getLizardPoints(d.r, d.x, d.y, d.angle  + counter * 120) : getGenericPoints(d.r, d.x, d.y, d.angle + counter * 120));
+							return lineFunction(reptiles ? getLizardPoints(d.r, d.x, d.y, d.angle  + counter * 120) : getHexagonPoints(d.r, d.x, d.y, d.angle + counter * 120));
 						});		
 					// additional 120 degree turn
 					if (!reptiles) {
@@ -131,7 +117,7 @@
 						.delay(2000)
 						.duration(0)
 						.attr("d", function(d) {
-							return lineFunction(getGenericPoints(d.r, d.x, d.y, d.angle + counter * 120));
+							return lineFunction(getHexagonPoints(d.r, d.x, d.y, d.angle + counter * 120));
 						});					;
 					}
 			});

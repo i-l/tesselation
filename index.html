@@ -55,7 +55,6 @@
                .attr("fill", function(d) { return d.color; });
 		
 			var counter = 0;
-			var colorShift = 0;
 			var update = function() {
 				svg.selectAll("path")
 					.transition()
@@ -72,7 +71,7 @@
 			});
 			var t = 0;
 			setInterval(function() { 
-				t = (t + 1) % 6
+				t = (t + 1) % 7
 				if (t == 5) {
 					counter++;
 				} else if (t == 3) {

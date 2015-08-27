@@ -1,4 +1,13 @@
 
+		
+function getPointByAngle(r, x, y, angle) {
+	return { "x": (x + r * Math.sin(Math.PI * angle / 180)),  "y": (y + r * Math.cos(Math.PI * angle / 180))}; 
+}
+			
+function getNextPoint(point, angle, dist) {
+	return { "x": point.x + dist * (Math.sin(angle)), "y": (point.y + dist * Math.cos(angle)) };
+}
+
 //// add equidistant points on a hexagon side
 function addLinePoints(points, refPoint, angle, numPoints, r) {
 	for (var i = 0; i < numPoints; i++) {

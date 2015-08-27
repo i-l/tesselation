@@ -4,11 +4,9 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="chrome=1">
     <title>Tesselation</title>
-
 	<script type="text/javascript" src="./d3/d3.js"></script>
     <link rel="stylesheet" href="stylesheets/styles.css">
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
-  
   </head>
   <body>
     <div class="wrapper">
@@ -23,14 +21,6 @@
 			var h = 680;
 			var svg = d3.select("body").append("svg").attr("width", w).attr("height", h);
 			var reptiles = true;
-		
-			var getPointByAngle = function(r, x, y, angle) {
-				return { "x": (x + r * Math.sin(Math.PI * angle / 180)),  "y": (y + r * Math.cos(Math.PI * angle / 180))}; 
-			}
-			
-			var getNextPoint = function(point, angle, dist) {
-				return { "x": point.x + dist * (Math.sin(angle)), "y": (point.y + dist * Math.cos(angle)) };
-			}
 								
 			var lineFunction = d3.svg.line()
                           .x(function(d) { return d.x; })
@@ -38,7 +28,7 @@
                           .interpolate("linear");
             
 			var r = 45;
-			var x = 250;
+			var x = 220;
 			var y = 70;
 			
 			var colors = ["#181C7F", "#7D82FF", "#3138FF" ];
@@ -72,20 +62,9 @@
 						.duration(2000)
 						.ease("linear")
 						.attr("d", function(d) {
-							var turnAngle = d.angle  + counter * 120;
+							var turnAngle = d.angle  + counter * 120;							
 							return lineFunction(reptiles ? getReptilePoints(d.r, d.x, d.y, turnAngle) : getHexagonPoints(d.r, d.x, d.y, turnAngle));
 						});		
-					// additional 120 degree turn
-					if (!reptiles) {
-						counter++;			
-						svg.selectAll("path")
-						.transition()
-						.delay(2000)
-						.duration(0)
-						.attr("d", function(d) {
-							return lineFunction(getHexagonPoints(d.r, d.x, d.y, d.angle + counter * 120));
-						});					;
-					}
 			});
 		</script>
  	  </section>

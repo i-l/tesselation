@@ -55,17 +55,39 @@
                .attr("fill", function(d) { return d.color; });
 		
 			var counter = 0;
+			
+			var update = function() {
+				svg.selectAll("path")
+					.transition()
+					.duration(2000)
+					.ease("linear")
+					.attr("d", function(d) {
+						var turnAngle = d.angle  + counter * 120;							
+						return lineFunction(reptiles ? getReptilePoints(d.r, d.x, d.y, turnAngle) : getHexagonPoints(d.r, d.x, d.y, turnAngle));
+					});
+			}
 			svg.on("click", function(e) {
-					reptiles = !reptiles;
-					svg.selectAll("path")
-						.transition()
-						.duration(2000)
-						.ease("linear")
-						.attr("d", function(d) {
-							var turnAngle = d.angle  + counter * 120;							
-							return lineFunction(reptiles ? getReptilePoints(d.r, d.x, d.y, turnAngle) : getHexagonPoints(d.r, d.x, d.y, turnAngle));
-						});		
+				reptiles = !reptiles;
+				update();
 			});
+			
+			setInterval(function() { 
+				var r = Math.floor(Math.random() * 5);
+				if (reptiles) {
+					console.log(r);
+					if (r == 0) {
+						counter++;
+					} else if (r == 1) {
+						counter--;
+					} else {
+						reptiles = !reptiles;
+					}
+				} else {
+					reptiles = !reptiles;					
+				}
+				
+				update();
+			}, 2400);
 		</script>
  	  </section>
     </div>
